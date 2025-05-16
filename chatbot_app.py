@@ -44,63 +44,43 @@ def send_message(user_prompt):
     )
     return response.choices[0].message.content
 
+# CSS styling mirip ChatGPT untuk chat bubble
 st.markdown("""
 <style>
-/* General Styling */
-body, html {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Chat bubbles */
-.user-bubble, .bot-bubble {
-    padding: 12px 16px;
-    border-radius: 20px;
-    max-width: 80%;
-    margin: 8px 0;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-}
-
 .user-bubble {
-    background-color: #10a37f;
+    background-color: #10a37f;  /* hijau ChatGPT */
     color: white;
-    border-bottom-right-radius: 0;
-    margin-left: auto;
-    text-align: left;
+    padding: 10px 15px;
+    border-radius: 20px 20px 0 20px;
+    max-width: 70%;
+    margin: 5px 0;
+    float: right;
+    clear: both;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    word-wrap: break-word;
 }
 
 .bot-bubble {
-    background-color: #2c2f36;
+    background-color: #444654; /* abu gelap ChatGPT */
     color: white;
-    border-bottom-left-radius: 0;
-    margin-right: auto;
-    text-align: left;
+    padding: 10px 15px;
+    border-radius: 20px 20px 20px 0;
+    max-width: 70%;
+    margin: 5px 0;
+    float: left;
+    clear: both;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    word-wrap: break-word;
 }
 
-/* Container for scrolling */
 .chat-container {
     overflow-y: auto;
-    max-height: 70vh;
-    padding-bottom: 20px;
-    margin-bottom: 10px;
-}
-
-/* Textarea auto-resize */
-textarea {
-    min-height: 40px !important;
-    resize: none !important;
-    overflow-y: hidden !important;
-}
-
-/* Send button styling */
-div[data-testid="stForm"] > div:last-child {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 0.5rem;
+    max-height: 600px;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
 }
 </style>
 """, unsafe_allow_html=True)
-
 
 chat_container = st.container()
 
