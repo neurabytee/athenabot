@@ -153,12 +153,17 @@ with st.form(key="chat_form"):
 
 if submit and user_input.strip():
     st.session_state.messages.append({"role": "user", "content": user_input})
+    st.session_state.pending_input = user_input  # set flag
+    st.experimental_rerun()
+
+if "pending_input" in st.session_state:
     try:
-        reply = send_message(user_input)
+        reply = send_message(st.session_state.pending_input)
     except Exception as e:
         reply = f"⚠️ Error: {e}"
     st.session_state.messages.append({"role": "assistant", "content": reply})
-    st.experimental_rerun()  # 👉 refresh untuk munculin balasan langsung
+    del st.session_state.pending_input
+    st.experimental_rerun()
 
 
 st.markdown("""
