@@ -34,21 +34,21 @@ SYSTEM_PROMPT = {
 
 
 def send_message(user_prompt):
-    # Kirimkan pesan sistem plus seluruh riwayat pesan + user prompt terbaru
+    
     messages = [SYSTEM_PROMPT] + st.session_state.messages + [{"role": "user", "content": user_prompt}]
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=messages,
         max_tokens=500,
-        temperature=0.5  # santai tapi informatif
+        temperature=0.5  
     )
     return response.choices[0].message.content
 
-# CSS styling mirip ChatGPT untuk chat bubble
+
 st.markdown("""
 <style>
 .user-bubble {
-    background-color: #10a37f;  /* hijau ChatGPT */
+    background-color: #10a37f;  
     color: white;
     padding: 10px 15px;
     border-radius: 20px 20px 0 20px;
@@ -61,7 +61,7 @@ st.markdown("""
 }
 
 .bot-bubble {
-    background-color: #444654; /* abu gelap ChatGPT */
+    background-color: #444654; 
     color: white;
     padding: 10px 15px;
     border-radius: 20px 20px 20px 0;
