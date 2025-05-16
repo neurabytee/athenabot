@@ -158,6 +158,8 @@ if submit and user_input.strip():
     except Exception as e:
         reply = f"⚠️ Error: {e}"
     st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.experimental_rerun()  # 👉 refresh untuk munculin balasan langsung
+
 
 st.markdown("""
 <script>
