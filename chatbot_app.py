@@ -109,14 +109,6 @@ button:hover {
     background-color: #0c8267;
 }
 
-.clear-btn {
-    background-color: #ef4444;
-}
-
-.clear-btn:hover {
-    background-color: #b91c1c;
-}
-
 .copy-btn {
     background-color: #3b82f6;
     margin-left: 8px;
@@ -159,12 +151,6 @@ with st.form(key="chat_form"):
     user_input = col1.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
     submit = col2.form_submit_button("Kirim")
 
-clear = st.button("Clear Chat", help="Hapus semua chat dan mulai baru")
-
-if clear:
-    st.session_state.messages = []
-    st.experimental_rerun()
-
 if submit and user_input.strip():
     st.session_state.messages.append({"role": "user", "content": user_input})
     try:
@@ -172,7 +158,6 @@ if submit and user_input.strip():
     except Exception as e:
         reply = f"⚠️ Error: {e}"
     st.session_state.messages.append({"role": "assistant", "content": reply})
-    st.experimental_rerun()
 
 st.markdown("""
 <script>
