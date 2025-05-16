@@ -154,13 +154,12 @@ with chat_container:
             ''', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Form input & tombol kirim + clear
 with st.form(key="chat_form"):
     col1, col2 = st.columns([8,1])
     user_input = col1.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
     submit = col2.form_submit_button("Kirim")
 
-clear = st.button("Clear Chat")
+clear = st.button("Clear Chat", help="Hapus semua chat dan mulai baru")
 
 if clear:
     st.session_state.messages = []
@@ -174,8 +173,7 @@ if submit and user_input.strip():
         reply = f"⚠️ Error: {e}"
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.experimental_rerun()
-    
-# Javascript untuk copy dan scroll otomatis
+
 st.markdown("""
 <script>
 function copyToClipboard(id) {
