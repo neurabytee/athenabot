@@ -156,10 +156,11 @@ with chat_container:
 
 # Form input & tombol kirim + clear
 with st.form(key="chat_form"):
-    col1, col2, col3 = st.columns([8,1,1])
+    col1, col2 = st.columns([8,1])
     user_input = col1.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
     submit = col2.form_submit_button("Kirim")
-    clear = col3.form_submit_button("Clear Chat")
+
+clear = st.button("Clear Chat")
 
 if clear:
     st.session_state.messages = []
@@ -173,7 +174,7 @@ if submit and user_input.strip():
         reply = f"⚠️ Error: {e}"
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.experimental_rerun()
-
+    
 # Javascript untuk copy dan scroll otomatis
 st.markdown("""
 <script>
