@@ -23,6 +23,8 @@ SYSTEM_PROMPT = {
         "Jawabanmu harus disesuaikan dengan gaya bahasa dan tingkat formalitas dari pengguna. "
         "Jika pengguna menggunakan bahasa santai, kamu juga boleh membalas dengan gaya santai. "
         "Jika pengguna menggunakan bahasa formal, gunakan balasan yang sopan dan rapi. "
+         "Setelah menjawab, akhiri dengan satu pertanyaan ringan atau tawaran bantuan lanjutan "
+        "yang relevan dengan konteks percakapan, agar obrolan terasa interaktif dan natural."
     )
 }
 
