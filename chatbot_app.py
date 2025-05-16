@@ -6,106 +6,32 @@ client = OpenAI(api_key=api_key)
 
 st.set_page_config(page_title="Chatbot ai", page_icon="🤖", layout="centered")
 
-st.title("🤖 Chatbot ai")
+st.title("Chatbot ai")
 st.markdown("Tanya apa saja, aku siap bantu!")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Prompt system untuk karakter AI yang lebih pintar, santai, dan berpengetahuan luas
 SYSTEM_PROMPT = {
     "role": "system",
     "content": (
-        "mampu menjawab berbagai topik dengan bahasa yang santai, mudah dimengerti, "
-        "dan informatif seperti ChatGPT yang cepat dan responsif. "
-        "Berikan jawaban yang jelas, lengkap, dan relevan."
-        "Kamu adalah asisten AI yang pintar, responsif, dan adaptif. "
-        "Jawabanmu harus disesuaikan dengan gaya bahasa dan tingkat formalitas dari pengguna. "
-        "Jika pengguna menggunakan bahasa santai, kamu juga boleh membalas dengan gaya santai. "
-        "Jika pengguna menggunakan bahasa formal, gunakan balasan yang sopan dan rapi. "
-         "Setelah menjawab, akhiri dengan satu pertanyaan ringan atau tawaran bantuan lanjutan "
-        "yang relevan dengan konteks percakapan, agar obrolan terasa interaktif dan natural."
-        "Jawaban harus lengkap tapi singkat dan to the point."
-       "You will be tasked to fix an issue from an open-source repository."
+        "Kamu adalah asisten AI yang cerdas, responsif, dan adaptif. "
+        "Gunakan gaya bahasa yang menyesuaikan dengan pengguna: santai jika santai, formal jika formal. "
+        "Jawaban harus jelas, informatif, relevan, dan singkat tapi padat. "
+        "Akhiri dengan pertanyaan ringan atau tawaran bantuan yang sesuai konteks agar percakapan terasa natural. "
 
-"Your thinking should be thorough and so it's fine if it's very long. You can think step by step before and after each action you decide to take."
+        "Tugasmu adalah memperbaiki masalah dari repositori open-source. "
+        "Pahami masalah secara menyeluruh, pikirkan langkah demi langkah, dan terus iterasi sampai tuntas. "
+        "Semua yang dibutuhkan ada di folder /testbed, tanpa perlu koneksi internet. "
 
-"You MUST iterate and keep going until the problem is solved."
+        "Jangan akhiri sebelum yakin masalah selesai dan perbaikannya benar. "
+        "Pastikan solusi diuji menyeluruh, tangani semua edge case, dan jangan asal tool call—buatlah dengan sadar dan tuntas. "
 
-"You already have everything you need to solve this problem in the /testbed folder, even without internet connection. I want you to fully solve this autonomously before coming back to me."
-
-"Only terminate your turn when you are sure that the problem is solved. Go through the problem step by step, and make sure to verify that your changes are correct. NEVER end your turn without having solved the problem, and when you say you are going to make a tool call, make sure you ACTUALLY make the tool call, instead of ending your turn."
-
-"THE PROBLEM CAN DEFINITELY BE SOLVED WITHOUT THE INTERNET."
-
-"Take your time and think through every step - remember to check your solution rigorously and watch out for boundary cases, especially with the changes you made. Your solution must be perfect. If not, continue working on it. At the end, you must test your code rigorously using the tools provided, and do it many times, to catch all edge cases. If it is not robust, iterate more and make it perfect. Failing to test your code sufficiently rigorously is the NUMBER ONE failure mode on these types of tasks; make sure you handle all edge cases, and run existing tests if they are provided."
-
-"You MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls. DO NOT do this entire process by making function calls only, as this can impair your ability to solve the problem and think insightfully."
-
-# Workflow
-
-## High-Level Problem Solving Strategy
-
-"Understand the problem deeply. Carefully read the issue and think critically about what is required."
-"Investigate the codebase. Explore relevant files, search for key functions, and gather context."
-"Develop a clear, step-by-step plan. Break down the fix into manageable, incremental steps."
-"Implement the fix incrementally. Make small, testable code changes."
-"Debug as needed. Use debugging techniques to isolate and resolve issues."
-"Test frequently. Run tests after each change to verify correctness."
-"Iterate until the root cause is fixed and all tests pass."
-" Reflect and validate comprehensively. After tests pass, think about the original intent, write additional tests to ensure correctness, and remember there are hidden tests that must also pass before the solution is truly complete."
-
-"Refer to the detailed sections below for more information on each step."
-
-## 1. Deeply Understand the Problem
-"Carefully read the issue and think hard about a plan to solve it before coding."
-
-## 2. Codebase Investigation
-"Explore relevant files and directories."
-"Search for key functions, classes, or variables related to the issue."
-"Read and understand relevant code snippets."
-"Identify the root cause of the problem."
-"Validate and update your understanding continuously as you gather more context."
-
-## 3. Develop a Detailed Plan
-"Outline a specific, simple, and verifiable sequence of steps to fix the problem."
-"Break down the fix into small, incremental changes."
-
-## 4. Making Code Changes
-"Before editing, always read the relevant file contents or section to ensure complete context."
-"If a patch is not applied correctly, attempt to reapply it."
-"Make small, testable, incremental changes that logically follow from your investigation and plan."
-
-## 5. Debugging
-"Make code changes only if you have high confidence they can solve the problem"
-"When debugging, try to determine the root cause rather than addressing symptoms"
-"Debug for as long as needed to identify the root cause and identify a fix"
-"Use print statements, logs, or temporary code to inspect program state, including descriptive statements or error messages to understand what's happening"
-"To test hypotheses, you can also add test statements or functions"
-"Revisit your assumptions if unexpected behavior occurs."
-
-## 6. Testing
-"Run tests frequently using (or equivalent)."
-"After each change, verify correctness by running relevant tests."
-"If tests fail, analyze failures and revise your patch."
-"Write additional tests if needed to capture important behaviors or edge cases."
-"Ensure all tests pass before finalizing."
-
-## 7. Final Verification
-"Confirm the root cause is fixed."
-"Review your solution for logic correctness and robustness."
-"Iterate until you are extremely confident the fix is complete and all tests pass."
-
-## 8. Final Reflection and Additional Testing
-"Reflect carefully on the original intent of the user and the problem statement."
-"Think about potential edge cases or scenarios that may not be covered by existing tests."
-"Write additional tests that would need to pass to fully validate the correctness of your solution."
-"Run these new tests and ensure they all pass."
-"Be aware that there are additional hidden tests that must also pass for the solution to be successful."
-"Do not assume the task is complete just because the visible tests pass; continue refining until you are confident the fix is robust and comprehensive."
-
+        "Strategimu: pahami masalah, telusuri kode, buat rencana, ubah kode sedikit demi sedikit, debug, uji, ulangi sampai berhasil. "
+        "Rencanakan sebelum fungsi dipanggil, dan refleksi setelahnya. Pastikan solusi benar-benar kuat dan lulus semua tes, termasuk yang tersembunyi."
     )
 }
+
 
 def send_message(user_prompt):
     # Kirimkan pesan sistem plus seluruh riwayat pesan + user prompt terbaru
@@ -118,49 +44,70 @@ def send_message(user_prompt):
     )
     return response.choices[0].message.content
 
-# CSS styling mirip ChatGPT untuk chat bubble
 st.markdown("""
 <style>
-.user-bubble {
-    background-color: #10a37f;  /* hijau ChatGPT */
-    color: white;
-    padding: 10px 15px;
-    border-radius: 20px 20px 0 20px;
-    max-width: 70%;
-    margin: 5px 0;
-    float: right;
-    clear: both;
+/* General Styling */
+body, html {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Chat bubbles */
+.user-bubble, .bot-bubble {
+    padding: 12px 16px;
+    border-radius: 20px;
+    max-width: 80%;
+    margin: 8px 0;
     word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.user-bubble {
+    background-color: #10a37f;
+    color: white;
+    border-bottom-right-radius: 0;
+    margin-left: auto;
+    text-align: left;
 }
 
 .bot-bubble {
-    background-color: #444654; /* abu gelap ChatGPT */
+    background-color: #2c2f36;
     color: white;
-    padding: 10px 15px;
-    border-radius: 20px 20px 20px 0;
-    max-width: 70%;
-    margin: 5px 0;
-    float: left;
-    clear: both;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    word-wrap: break-word;
+    border-bottom-left-radius: 0;
+    margin-right: auto;
+    text-align: left;
 }
 
+/* Container for scrolling */
 .chat-container {
     overflow-y: auto;
-    max-height: 600px;
-    padding-bottom: 10px;
-    margin-bottom: 30px;
+    max-height: 70vh;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+/* Textarea auto-resize */
+textarea {
+    min-height: 40px !important;
+    resize: none !important;
+    overflow-y: hidden !important;
+}
+
+/* Send button styling */
+div[data-testid="stForm"] > div:last-child {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
 }
 </style>
 """, unsafe_allow_html=True)
 
+
 chat_container = st.container()
 
 with st.form(key="chat_form", clear_on_submit=True):
-    user_input = st.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
+    user_input = st.text_area("💬", placeholder="Tulis pesanmu di sini...", key="user_input", label_visibility="collapsed", height=40)
     submit = st.form_submit_button("Kirim")
+
 
 if submit and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
