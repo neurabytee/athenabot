@@ -1,6 +1,5 @@
 import streamlit as st
 from openai import OpenAI
-import json
 
 api_key = st.secrets["openai_api_key"]
 client = OpenAI(api_key=api_key)
@@ -148,7 +147,6 @@ with chat_container:
         if msg["role"] == "user":
             st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
         else:
-            # Tambah tombol copy di setiap balasan bot
             msg_id = f"msg_{i}"
             st.markdown(f'''
                 <div class="bot-bubble" id="{msg_id}">{msg["content"]}</div>
@@ -156,8 +154,8 @@ with chat_container:
             ''', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Form input & tombol kirim
-with st.form(key="chat_form", clear_on_submit=True):
+# Form input & tombol kirim + clear
+with st.form(key="chat_form"):
     col1, col2, col3 = st.columns([8,1,1])
     user_input = col1.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
     submit = col2.form_submit_button("Kirim")
@@ -165,6 +163,7 @@ with st.form(key="chat_form", clear_on_submit=True):
 
 if clear:
     st.session_state.messages = []
+    st.experimental_rerun()
 
 if submit and user_input.strip():
     st.session_state.messages.append({"role": "user", "content": user_input})
@@ -175,7 +174,7 @@ if submit and user_input.strip():
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.experimental_rerun()
 
-# JavaScript untuk copy ke clipboard dan scroll otomatis
+# Javascript untuk copy dan scroll otomatis
 st.markdown("""
 <script>
 function copyToClipboard(id) {
