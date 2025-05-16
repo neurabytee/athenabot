@@ -105,9 +105,8 @@ div[data-testid="stForm"] > div:last-child {
 chat_container = st.container()
 
 with st.form(key="chat_form", clear_on_submit=True):
-    user_input = st.text_area("💬", placeholder="Tulis pesanmu di sini...", key="user_input", label_visibility="collapsed", height=40)
+    user_input = st.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
     submit = st.form_submit_button("Kirim")
-
 
 if submit and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
