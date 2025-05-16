@@ -113,11 +113,17 @@ with st.form(key="chat_form"):
     user_input = col1.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
     submit = col2.form_submit_button("Kirim")
 
-# Jika tombol submit ditekan
+
 if submit and user_input.strip():
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    st.session_state.pending_input = user_input
-    st.experimental_rerun()
+    with st.spinner("Sedang menjawab..."):
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        try:
+            reply = send_message(user_input)
+        except Exception as e:
+            reply = f"⚠️ Error: {e}"
+        st.session_state.messages.append({"role": "assistant", "content": reply})
+        # Tidak perlu st.experimental_rerun()
+
 
 # Proses pending_input setelah rerun
 if "pending_input" in st.session_state:
@@ -138,9 +144,12 @@ function copyToClipboard(id) {
         alert('Copied to clipboard!');
     });
 }
-const chatContainer = document.getElementById('chat-container');
-if(chatContainer){
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+window.onload = function() {
+    const chatContainer = document.getElementById('chat-container');
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 }
 </script>
+
 """, unsafe_allow_html=True)
