@@ -159,43 +159,8 @@ st.markdown("""
 chat_container = st.container()
 
 with st.form(key="chat_form", clear_on_submit=True):
-    st.markdown("""
-    <style>
-    .chat-input-row {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-    .chat-input-textarea {
-        flex-grow: 1;
-        resize: none;
-        padding: 10px;
-        font-size: 16px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-    }
-    .chat-submit-button {
-        background-color: #10a37f;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 10px 20px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    .chat-submit-button:hover {
-        background-color: #0e7d65;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # HTML-style layout
-    st.markdown('<div class="chat-input-row">', unsafe_allow_html=True)
-    user_input = st.text_area("Ketik pesan kamu:", key="user_input", label_visibility="collapsed", height=70)
-    submit = st.form_submit_button("Kirim", type="primary")
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    user_input = st.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
+    submit = st.form_submit_button("Kirim")
 
 if submit and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
