@@ -4,9 +4,9 @@ from openai import OpenAI
 api_key = st.secrets["openai_api_key"]
 client = OpenAI(api_key=api_key)
 
-st.set_page_config(page_title="Chatbot Billie", page_icon="🤖", layout="centered")
+st.set_page_config(page_title="Chatbot ai", page_icon="🤖", layout="centered")
 
-st.title("🤖 Chatbot Billie")
+st.title("🤖 Chatbot ai")
 st.markdown("Tanya apa saja, aku siap bantu!")
 
 if "messages" not in st.session_state:
