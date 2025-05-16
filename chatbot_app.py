@@ -1,17 +1,20 @@
 import streamlit as st
 from openai import OpenAI
 
+# API Key aman via st.secrets
 api_key = st.secrets["openai_api_key"]
 client = OpenAI(api_key=api_key)
 
-st.set_page_config(page_title="Chatbot AI", page_icon="🤖", layout="wide")
+# Konfigurasi halaman
+st.set_page_config(page_title="Chatbot AI", page_icon="🤖", layout="centered")
 st.title("🤖 Chatbot AI")
 st.markdown("Tanya apa saja, aku siap bantu!")
 
+# Inisialisasi state pesan
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# SYSTEM PROMPT
+# Prompt sistem (karakter AI)
 SYSTEM_PROMPT = {
     "role": "system",
     "content": (
@@ -22,9 +25,9 @@ SYSTEM_PROMPT = {
     )
 }
 
-# Kirim prompt ke OpenAI
-def send_message(user_prompt):
-    messages = [SYSTEM_PROMPT] + st.session_state.messages + [{"role": "user", "content": user_prompt}]
+# Fungsi kirim prompt ke OpenAI
+def send_message(prompt):
+    messages = [SYSTEM_PROMPT] + st.session_state.messages + [{"role": "user", "content": prompt}]
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=messages,
@@ -33,123 +36,62 @@ def send_message(user_prompt):
     )
     return response.choices[0].message.content
 
-# CSS
+# Styling chat bubble
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
-
-body, .block-container {
-    font-family: 'Inter', sans-serif;
-    background-color: #0f111a;
-    color: #d1d5db;
-}
-.chat-container {
-    max-height: 600px;
-    overflow-y: auto;
-    padding: 15px;
-    border-radius: 12px;
-    background-color: #20232a;
-    box-shadow: 0 4px 8px rgb(0 0 0 / 0.3);
-    margin-bottom: 10px;
-}
-.user-bubble, .bot-bubble {
-    padding: 12px 18px;
-    border-radius: 20px;
-    max-width: 70%;
-    margin-bottom: 10px;
-    animation: fadeInUp 0.3s ease forwards;
-    word-wrap: break-word;
-    line-height: 1.4;
-    font-size: 16px;
-}
 .user-bubble {
     background-color: #10a37f;
     color: white;
-    margin-left: auto;
+    padding: 10px 15px;
     border-radius: 20px 20px 0 20px;
+    max-width: 70%;
+    margin: 5px 0;
+    float: right;
+    clear: both;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    word-wrap: break-word;
 }
 .bot-bubble {
     background-color: #444654;
     color: white;
-    margin-right: auto;
+    padding: 10px 15px;
     border-radius: 20px 20px 20px 0;
+    max-width: 70%;
+    margin: 5px 0;
+    float: left;
+    clear: both;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    word-wrap: break-word;
 }
-button.copy-btn {
-    background-color: #3b82f6;
-    margin-left: 8px;
-    border: none;
-    padding: 4px 10px;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-}
-button.copy-btn:hover {
-    background-color: #1e40af;
-}
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.chat-container {
+    overflow-y: auto;
+    max-height: 600px;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Tampilkan semua pesan
+# Form input
+with st.form(key="chat_form", clear_on_submit=True):
+    user_input = st.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
+    submitted = st.form_submit_button("Kirim")
+
+if submitted and user_input:
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    with st.spinner("Mengetik balasan..."):
+        try:
+            response = send_message(user_input)
+        except Exception as e:
+            response = f"⚠️ Error saat mengambil balasan: {e}"
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
+# Tampilan chat
 with st.container():
-    st.markdown('<div class="chat-container" id="chat-container">', unsafe_allow_html=True)
-    for i, msg in enumerate(st.session_state.messages):
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    for msg in st.session_state.messages:
         if msg["role"] == "user":
             st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
         else:
-            msg_id = f"msg_{i}"
-            st.markdown(f'''
-                <div class="bot-bubble" id="{msg_id}">{msg["content"]}</div>
-                <button class="copy-btn" onclick="copyToClipboard('{msg_id}')">Copy</button>
-            ''', unsafe_allow_html=True)
+            st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
-
-# Form input chat
-with st.form(key="chat_form"):
-    col1, col2 = st.columns([8, 1])
-    user_input = col1.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
-    submit = col2.form_submit_button("Kirim")
-
-
-if submit and user_input.strip():
-    with st.spinner("Sedang menjawab..."):
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        try:
-            reply = send_message(user_input)
-        except Exception as e:
-            reply = f"⚠️ Error: {e}"
-        st.session_state.messages.append({"role": "assistant", "content": reply})
-        # Tidak perlu st.experimental_rerun()
-
-
-# Proses pending_input setelah rerun
-if "pending_input" in st.session_state:
-    try:
-        reply = send_message(st.session_state.pending_input)
-    except Exception as e:
-        reply = f"⚠️ Error: {e}"
-    st.session_state.messages.append({"role": "assistant", "content": reply})
-    del st.session_state.pending_input
-    st.experimental_rerun()
-
-# JS for copy + scroll
-st.markdown("""
-<script>
-function copyToClipboard(id) {
-    const text = document.getElementById(id).innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard!');
-    });
-}
-window.onload = function() {
-    const chatContainer = document.getElementById('chat-container');
-    if (chatContainer) {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-}
-</script>
-
-""", unsafe_allow_html=True)
