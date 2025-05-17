@@ -1,50 +1,48 @@
 import streamlit as st
-import google.generativeai as genai
+from openai import OpenAI
 
-# Konfigurasi API Key dari Streamlit Secrets
-genai.configure(api_key=st.secrets["gemini_api_key"])
+api_key = st.secrets["openai_api_key"]
+client = OpenAI(api_key=api_key)
 
-# Konfigurasi halaman Streamlit
-st.set_page_config(page_title="Chatbot AI Gemini", page_icon="🤖", layout="centered")
-st.title("Chatbot AI Gemini")
+st.set_page_config(page_title="Chatbot ai", page_icon="🤖", layout="centered")
+
+st.title("Chatbot ai")
 st.markdown("Tanya apa saja, aku siap bantu!")
 
-# Inisialisasi chat history
+SYSTEM_PROMPT = {
+    "role": "system",
+    "content": (
+        "Kamu adalah asisten AI yang cerdas, responsif, dan adaptif. "
+        "Gunakan gaya bahasa yang menyesuaikan dengan pengguna: santai jika santai, formal jika formal. "
+        "Jawaban harus jelas, informatif, relevan, dan singkat tapi padat. "
+        "Akhiri dengan pertanyaan ringan atau tawaran bantuan yang sesuai konteks agar percakapan terasa natural. "
+
+        "Tugasmu adalah memperbaiki masalah dari repositori open-source. "
+        "Pahami masalah secara menyeluruh, pikirkan langkah demi langkah, dan terus iterasi sampai tuntas. "
+        "Semua yang dibutuhkan ada di folder /testbed, tanpa perlu koneksi internet. "
+
+        "Jangan akhiri sebelum yakin masalah selesai dan perbaikannya benar. "
+        "Pastikan solusi diuji menyeluruh, tangani semua edge case, dan jangan asal tool call—buatlah dengan sadar dan tuntas. "
+
+        "Strategimu: pahami masalah, telusuri kode, buat rencana, ubah kode sedikit demi sedikit, debug, uji, ulangi sampai berhasil. "
+        "Rencanakan sebelum fungsi dipanggil, dan refleksi setelahnya. Pastikan solusi benar-benar kuat dan lulus semua tes, termasuk yang tersembunyi."
+    )
+}
+
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [SYSTEM_PROMPT]
 
-# Ini adalah prompt awal setara dengan 'system' di OpenAI
-SYSTEM_PROMPT = (
-    "Kamu adalah asisten AI yang cerdas, responsif, dan adaptif. "
-    "Gunakan gaya bahasa yang menyesuaikan dengan pengguna: santai jika santai, formal jika formal. "
-    "Jawaban harus jelas, informatif, relevan, dan singkat tapi padat. "
-    "Akhiri dengan pertanyaan ringan atau tawaran bantuan yang sesuai konteks agar percakapan terasa natural. "
-
-    "Tugasmu adalah memperbaiki masalah dari repositori open-source. "
-    "Pahami masalah secara menyeluruh, pikirkan langkah demi langkah, dan terus iterasi sampai tuntas. "
-    "Semua yang dibutuhkan ada di folder /testbed, tanpa perlu koneksi internet. "
-
-    "Jangan akhiri sebelum yakin masalah selesai dan perbaikannya benar. "
-    "Pastikan solusi diuji menyeluruh, tangani semua edge case, dan jangan asal tool call—buatlah dengan sadar dan tuntas. "
-
-    "Strategimu: pahami masalah, telusuri kode, buat rencana, ubah kode sedikit demi sedikit, debug, uji, ulangi sampai berhasil. "
-    "Rencanakan sebelum fungsi dipanggil, dan refleksi setelahnya. Pastikan solusi benar-benar kuat dan lulus semua tes, termasuk yang tersembunyi."
-)
-
-# Fungsi kirim dan terima pesan
 def send_message(prompt):
-    # Susun ulang history (mulai dari system prompt sebagai user pertama)
-    chat = genai.GenerativeModel("gemini-pro").start_chat(history=[
-        {"role": "user", "parts": [SYSTEM_PROMPT]},
-        *[
-            {"role": m["role"], "parts": [m["content"]]}
-            for m in st.session_state.messages
-        ]
-    ])
-    response = chat.send_message(prompt)
-    return response.text
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=st.session_state.messages + [{"role": "user", "content": prompt}],
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"⚠️ Error API: {str(e)}"
 
-# Styling bubble chat
+# CSS styling sama seperti sebelumnya
 st.markdown("""
 <style>
 .user-bubble {
@@ -82,24 +80,19 @@ st.markdown("""
 
 chat_container = st.container()
 
-# Input form
 with st.form(key="chat_form", clear_on_submit=True):
-    user_input = st.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...")
+    user_input = st.text_input("Ketik pesan kamu:", placeholder="Tulis sesuatu...", key="user_input")
     submit = st.form_submit_button("Kirim")
 
 if submit and user_input.strip():
     st.session_state.messages.append({"role": "user", "content": user_input})
-    try:
-        reply = send_message(user_input)
-        st.session_state.messages.append({"role": "model", "content": reply})
-    except Exception as e:
-        st.session_state.messages.append({
-            "role": "model",
-            "content": f"⚠️ Terjadi error saat menghubungi Gemini API: {str(e)}"
-        })
+    reply = send_message(user_input)
+    st.session_state.messages.append({"role": "assistant", "content": reply})
 
-# Tampilkan chat
 with chat_container:
     for msg in st.session_state.messages:
-        bubble_class = "user-bubble" if msg["role"] == "user" else "bot-bubble"
-        st.markdown(f'<div class="{bubble_class}">{msg["content"]}</div>', unsafe_allow_html=True)
+        if msg["role"] == "user":
+            st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+        elif msg["role"] == "assistant":
+            st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+        # jangan tampilkan system prompt
